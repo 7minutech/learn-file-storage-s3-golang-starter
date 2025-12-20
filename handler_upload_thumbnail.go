@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"io"
 	"net/http"
@@ -38,28 +39,32 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 	file, header, err := r.FormFile("thumbnail")
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Unable to parse form file", err)
+		return
 	}
 
 	mediaType := header.Header.Get("Content-Type")
 	data, err := io.ReadAll(file)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Unable to read form file", err)
+		return
 	}
 
 	dbVideo, err := cfg.db.GetVideo(videoID)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Unable to get video", err)
+		return
 	}
 
 	if userID != dbVideo.UserID {
 		respondWithError(w, http.StatusUnauthorized, "user is not creator of video", err)
+		return
 	}
 
-	videoThumbnails[videoID] = thumbnail{data: data, mediaType: mediaType}
+	dataString := base64.StdEncoding.EncodeToString(data)
 
-	var thumbnailURL = fmt.Sprintf("http://localhost:%s/api/thumbnails/%s", cfg.port, videoIDString)
+	var dataURL = fmt.Sprintf("data:%s;base64,%s", mediaType, dataString)
 
-	dbVideo.ThumbnailURL = &thumbnailURL
+	dbVideo.ThumbnailURL = &dataURL
 
 	cfg.db.UpdateVideo(dbVideo)
 
