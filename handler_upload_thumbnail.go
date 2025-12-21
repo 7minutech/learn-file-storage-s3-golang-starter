@@ -67,6 +67,9 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 	videoFilePath := filepath.Join(cfg.assetsRoot, videoPath)
 
 	createdFile, err := os.Create(videoFilePath)
+
+	defer createdFile.Close()
+
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Unable to create video file", err)
 		return
