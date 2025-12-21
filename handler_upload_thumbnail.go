@@ -27,7 +27,7 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 
 	userID, err := auth.ValidateJWT(token, cfg.jwtSecret)
 	if err != nil {
-		respondWithError(w, http.StatusUnauthorized, "Couldn't validate JWT", err)
+		respondWithError(w, http.StatusUnauthorized, "Couldn't validate JWT", nil)
 		return
 	}
 
@@ -68,12 +68,12 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 
 	createdFile, err := os.Create(videoFilePath)
 
-	defer createdFile.Close()
-
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Unable to create video file", err)
 		return
 	}
+
+	defer createdFile.Close()
 
 	if _, err := io.Copy(createdFile, file); err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Unable to copy multipart File to destination File", err)
