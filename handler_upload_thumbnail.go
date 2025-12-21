@@ -47,10 +47,6 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 	}
 
 	mediaType := header.Header.Get("Content-Type")
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Unable to read form file", err)
-		return
-	}
 
 	dbVideo, err := cfg.db.GetVideo(videoID)
 	if err != nil {
