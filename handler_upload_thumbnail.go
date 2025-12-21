@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/bootdotdev/learn-file-storage-s3-golang-starter/internal/auth"
 	"github.com/google/uuid"
@@ -61,11 +62,15 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 	}
 
 	if userID != dbVideo.UserID {
-		respondWithError(w, http.StatusUnauthorized, "user is not creator of video", err)
+		respondWithError(w, http.StatusUnauthorized, "user is not creator of video", nil)
 		return
 	}
 
 	prefix := "image/"
+	if !strings.HasPrefix(mediaType, prefix) {
+		respondWithError(w, http.StatusBadRequest, "Unsupported Content-Type", nil)
+		return
+	}
 	fileExtension := mediaType[len(prefix):]
 
 	videoPath := videoIDString + "." + fileExtension
