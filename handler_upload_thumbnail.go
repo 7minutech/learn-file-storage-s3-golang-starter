@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"mime"
 	"net/http"
 	"os"
@@ -53,8 +52,6 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 
 	mediaType := header.Header.Get("Content-Type")
 
-	log.Print(mediaType)
-
 	if mediaType == "" {
 		respondWithError(w, http.StatusBadRequest, "Missing Content-Type", nil)
 		return
@@ -65,8 +62,6 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 		respondWithError(w, http.StatusInternalServerError, "Unable to parse media type", err)
 		return
 	}
-
-	log.Print(mediaType)
 
 	if mediaType != "image/png" && mediaType != "image/jpeg" {
 		respondWithError(w, http.StatusBadRequest, "Invalid Content-Type", nil)
