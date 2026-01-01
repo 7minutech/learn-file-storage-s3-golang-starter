@@ -17,29 +17,28 @@ type stream struct {
 	Height int `json:"height"`
 }
 
+const landscape = float64(16) / float64(9)
+const portrait = float64(9) / float64(16)
+const landscapeStr = "16:9"
+const portraitStr = "9:16"
+
 func calculateAspectRatio(width, height int) string {
-	gcf := greatestCommonFactor(width, height)
 
-	return fmt.Sprintf("%d:%d", width/gcf, height/gcf)
-}
+	aspectRatio := float64(width) / float64(height)
 
-func greatestCommonFactor(a, b int) int {
-	factor := a
-	if a > b {
-		factor = b
+	if landscape-0.2 < float64(aspectRatio) && float64(aspectRatio) < landscape+0.2 {
+		return landscapeStr
+	} else if portrait-0.2 < float64(aspectRatio) && float64(aspectRatio) < portrait+0.2 {
+		return portraitStr
+	} else {
+		return "other"
 	}
-	for a%factor != 0 || b%factor != 0 {
-		if a%factor == 0 || b%factor == 0 {
-		}
-		factor -= 1
-	}
-	return factor
 
 }
 
 func getVideoAspectRatio(filePath string) (string, error) {
 
-	args := []string{"-v", "error", "-print-format", "json", "-show-streams", filePath}
+	args := []string{"-v", "error", "-print_format", "json", "-show_streams", filePath}
 
 	cmd := exec.Command("ffprobe", args...)
 
