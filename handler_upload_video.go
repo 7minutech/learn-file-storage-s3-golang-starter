@@ -15,6 +15,18 @@ import (
 	"github.com/google/uuid"
 )
 
+func videoPrefix(aspectRatio string) string {
+	fmt.Println(aspectRatio)
+	switch aspectRatio {
+	case "16:9":
+		return "landscape"
+	case "9:16":
+		return "portrait"
+	default:
+		return "other"
+	}
+}
+
 func (cfg *apiConfig) handlerUploadVideo(w http.ResponseWriter, r *http.Request) {
 
 	const uploadLimit = 1 << 30
@@ -109,7 +121,15 @@ func (cfg *apiConfig) handlerUploadVideo(w http.ResponseWriter, r *http.Request)
 	}
 	hexKey := hex.EncodeToString(key)
 
-	videoPath := hexKey + "." + fileExtension
+	aspectRatio, err := getVideoAspectRatio(tmpFile.Name())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "could not get video aspect ratio", err)
+		return
+	}
+
+	prefix := videoPrefix(aspectRatio)
+
+	videoPath := fmt.Sprintf("%s/%s.%s", prefix, hexKey, fileExtension)
 
 	_, err = cfg.s3Client.PutObject(r.Context(), &s3.PutObjectInput{
 		Bucket:      aws.String(cfg.s3Bucket),
