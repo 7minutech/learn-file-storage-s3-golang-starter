@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -11,12 +10,12 @@ import (
 
 func (cfg *apiConfig) dbVideoToSignedVideo(video database.Video) (database.Video, error) {
 	if video.VideoURL == nil {
-		return video, fmt.Errorf("video url must be not nil")
+		return video, nil
 	}
 
 	videoParts := strings.Split(*video.VideoURL, ",")
 	if len(videoParts) != 2 {
-		return video, fmt.Errorf("video url must have bucket,key")
+		return video, nil
 	}
 
 	bucket := videoParts[0]
