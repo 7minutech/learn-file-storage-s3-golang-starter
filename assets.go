@@ -36,5 +36,5 @@ func mediaTypeToExt(mediaType string) string {
 }
 
 func (cfg apiConfig) getObjectURL(key string) string {
-	return fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", cfg.s3Bucket, cfg.s3Region, key)
+	return fmt.Sprintf("%s,%s", cfg.s3Bucket, key)
 }
